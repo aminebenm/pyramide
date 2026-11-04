@@ -1,0 +1,555 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>[hidden]{display:none!important}body{margin:0}img{max-width:100%}</style>
+<title>Pyramide en famille</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Figtree:wght@400;600;800&display=swap">
+<style>
+/* Layout : plateau TV à une colonne, la pyramide au centre de chaque écran, gros boutons au pouce */
+:root{
+  --night:#15102c; --stage:#231c47; --stage-2:#2e2560;
+  --sand:#efbd4c; --sand-deep:#b9862a;
+  --teamA:#3fd3c9; --teamB:#ff9257; --miss:#ff5d6c;
+  --ink:#f6eedb; --muted:#a8a1c9; --line:rgba(239,189,76,.22);
+  --display:"Bowlby One","Arial Black",Impact,sans-serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:dark;
+}
+html,body{height:100%}
+body{
+  background:var(--night); color:var(--ink); font-family:var(--body); font-size:16px;
+  background-image:
+    radial-gradient(ellipse 80% 55% at 50% 0%, rgba(239,189,76,.16), transparent 70%),
+    repeating-conic-gradient(from 0deg at 50% -10%, rgba(255,255,255,.025) 0 6deg, transparent 6deg 12deg);
+  background-attachment:fixed;
+}
+.app{max-width:520px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;gap:18px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:14px 28px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.logo{font-family:var(--display);font-size:22px;letter-spacing:.06em;color:var(--sand);display:flex;align-items:center;gap:8px}
+.logo svg{width:26px;height:22px}
+.iconbtn{background:var(--stage);border:1px solid var(--line);color:var(--ink);border-radius:999px;padding:8px 12px;font:600 14px var(--body);cursor:pointer}
+h1,h2{font-family:var(--display);font-weight:400;margin:0;text-wrap:balance;line-height:1.05}
+h1{font-size:clamp(36px,11vw,54px);color:var(--sand);letter-spacing:.02em}
+h2{font-size:clamp(24px,7vw,32px)}
+p{margin:0;line-height:1.5}
+.lead{color:var(--muted)}
+.eyebrow{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--sand)}
+.panel{background:var(--stage);border:1px solid var(--line);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:14px}
+.flabel{font-weight:600;font-size:14px;color:var(--muted)}
+label.f{display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:14px;color:var(--muted)}
+.fgroup{display:flex;flex-direction:column;gap:6px}
+input[type=text]{background:var(--night);border:2px solid var(--stage-2);color:var(--ink);border-radius:12px;padding:12px 14px;font:600 17px var(--body);width:100%;box-sizing:border-box}
+input[type=text]:focus{outline:none;border-color:var(--sand)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{flex:1 1 auto;background:var(--night);border:2px solid var(--stage-2);color:var(--ink);border-radius:12px;padding:10px 8px;font:600 15px var(--body);cursor:pointer;min-width:0}
+.seg button[aria-pressed=true]{border-color:var(--sand);background:rgba(239,189,76,.14);color:var(--sand)}
+.seg small{display:block;font-weight:400;font-size:12px;color:var(--muted)}
+.btn{display:block;width:100%;border:none;border-radius:16px;padding:18px;font:400 20px var(--display);letter-spacing:.03em;cursor:pointer;color:#1b1433;background:var(--sand);box-shadow:0 5px 0 var(--sand-deep);transition:transform .08s}
+.btn:active{transform:translateY(3px);box-shadow:0 2px 0 var(--sand-deep)}
+.btn.ghost{background:transparent;color:var(--ink);border:2px solid var(--stage-2);box-shadow:none;font:700 16px var(--body);padding:14px}
+.btn.ok{background:var(--teamA);box-shadow:0 5px 0 #23948d}
+.btn.okB{background:var(--teamB);box-shadow:0 5px 0 #bd5f2c}
+.btn.miss{background:var(--miss);box-shadow:0 5px 0 #b23240;color:#fff}
+.btn:focus-visible,.seg button:focus-visible,.iconbtn:focus-visible,.theme:focus-visible,.bid:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.actions{display:grid;gap:14px}
+.actions.two{grid-template-columns:1fr 1fr}
+details{color:var(--muted);font-size:15px}
+details summary{cursor:pointer;font-weight:700;color:var(--ink)}
+details ol{padding-left:20px;margin:10px 0 0;display:grid;gap:6px;line-height:1.45}
+.toggle{display:flex;align-items:center;justify-content:space-between;gap:10px;font-weight:600}
+.switch{width:52px;height:30px;border-radius:999px;background:var(--stage-2);border:none;position:relative;cursor:pointer;flex:none}
+.switch::after{content:"";position:absolute;top:4px;left:4px;width:22px;height:22px;border-radius:50%;background:var(--muted);transition:.15s}
+.switch[aria-checked=true]{background:var(--sand)}
+.switch[aria-checked=true]::after{left:26px;background:#1b1433}
+
+/* Scores */
+.scores{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.score{border-radius:14px;padding:10px 12px;background:var(--stage);border:2px solid transparent;display:flex;flex-direction:column;gap:2px;min-width:0}
+.score b{font-family:var(--display);font-size:30px;font-weight:400;font-variant-numeric:tabular-nums;line-height:1}
+.score span{font-weight:700;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.score.a span,.score.a b{color:var(--teamA)} .score.b span,.score.b b{color:var(--teamB)}
+.score.active.a{border-color:var(--teamA)} .score.active.b{border-color:var(--teamB)}
+
+/* Thèmes */
+.themes{display:grid;gap:10px}
+.theme{display:flex;align-items:center;gap:14px;text-align:left;background:var(--stage);border:2px solid var(--stage-2);color:var(--ink);border-radius:16px;padding:14px 16px;cursor:pointer;font:inherit}
+.theme .ico{width:44px;height:44px;border-radius:12px;background:var(--night);display:flex;align-items:center;justify-content:center;font-family:var(--display);color:var(--sand);font-size:20px;flex:none}
+.theme b{display:block;font-size:18px}
+.theme small{color:var(--muted);font-size:13px}
+.theme:active{border-color:var(--sand)}
+
+/* Choix du nombre de mots */
+.bids{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.bid{background:var(--sand);border:none;color:#1b1433;border-radius:14px;padding:14px 4px;box-shadow:0 5px 0 var(--sand-deep);touch-action:manipulation;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;font:inherit}
+.bid b{font-family:var(--display);font-size:30px;font-weight:400;line-height:1}
+.bid small{font-size:12px;color:#5a4a1e;font-weight:700}
+.bid .p{color:#1b1433;font-weight:800;font-size:13px;background:rgba(255,255,255,.45);border-radius:999px;padding:1px 7px;margin-top:2px}
+.bid:active{transform:translateY(3px);box-shadow:0 2px 0 var(--sand-deep)}
+
+/* Indices utilisés */
+.slots{display:flex;justify-content:center;gap:10px}
+.slot{width:44px;height:44px;border-radius:50%;border:3px solid var(--sand);display:flex;align-items:center;justify-content:center;font-family:var(--display);color:var(--sand);font-size:18px}
+.slot.used{background:var(--stage-2);border-color:var(--stage-2);color:var(--muted)}
+.slot.now{background:var(--sand);color:#1b1433;transform:scale(1.1)}
+
+/* Carte du mot */
+.word{position:relative;background:var(--ink);color:#1b1433;border-radius:18px;padding:22px 16px;text-align:center;min-height:96px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;box-shadow:0 10px 30px rgba(0,0,0,.35);cursor:pointer}
+.word .w{font-family:var(--display);font-size:clamp(28px,9.5vw,44px);line-height:1.05;word-break:break-word;text-transform:uppercase}
+.word .hint{font-size:12px;font-weight:700;color:#6b6290;letter-spacing:.08em;text-transform:uppercase}
+.word.hidden{background:var(--stage-2);color:var(--muted)}
+.word.hidden .w{font-size:22px;color:var(--muted)}
+.word.hidden .hint{color:var(--muted)}
+.turn{text-align:center;font-weight:800;font-size:18px}
+.small{font-size:13px;color:var(--muted);text-align:center}
+.linkbtn{background:none;border:none;color:var(--muted);font:600 14px var(--body);text-decoration:underline;cursor:pointer;padding:6px;align-self:center}
+.status{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.tag{display:inline-block;padding:5px 12px;border-radius:999px;font-weight:800;font-size:13px;background:var(--stage-2);color:var(--ink)}
+.tag.a{background:var(--teamA);color:#10302e} .tag.b{background:var(--teamB);color:#3a1a08}
+
+/* Cover */
+.cover{display:flex;flex-direction:column;gap:18px;text-align:center;align-items:center;padding-top:6px}
+.eye{width:90px;height:90px;border-radius:50%;background:var(--stage);display:flex;align-items:center;justify-content:center;border:2px solid var(--line)}
+.eye svg{width:50px;height:50px}
+
+/* Pyramide des 6 mots */
+.bricks{display:flex;flex-direction:column;align-items:center;gap:6px}
+.bricks .r{display:flex;gap:6px}
+.brick{width:78px;height:40px;border-radius:8px;background:var(--stage-2);display:flex;align-items:center;justify-content:center;font-family:var(--display);color:var(--muted);font-size:16px;transition:.3s}
+.brick.done{background:var(--sand);color:#1b1433;box-shadow:inset 0 -5px 0 rgba(0,0,0,.18)}
+.brick.lost{background:rgba(255,93,108,.25);color:var(--miss)}
+.brick.cur{outline:3px solid var(--ink)}
+.timer{height:14px;border-radius:999px;background:var(--stage-2);overflow:hidden}
+.timer i{display:block;height:100%;background:var(--sand);transition:width .25s linear}
+.timer.low i{background:var(--miss)}
+.stimer{display:flex;align-items:center;gap:12px}
+.stimer .timer{flex:1}
+.sclock{font-family:var(--display);font-size:24px;font-variant-numeric:tabular-nums;min-width:64px;color:var(--sand)}
+.sclock.low{color:var(--miss)}
+.clock{font-family:var(--display);font-size:44px;text-align:center;font-variant-numeric:tabular-nums;line-height:1}
+
+.result{text-align:center;display:flex;flex-direction:column;gap:12px;align-items:center}
+.big{font-family:var(--display);font-size:clamp(32px,10vw,50px);text-transform:uppercase;color:var(--sand);line-height:1.05;word-break:break-word}
+.pill{display:inline-block;padding:6px 14px;border-radius:999px;font-weight:800;background:var(--stage-2)}
+.pill.a{background:var(--teamA);color:#10302e} .pill.b{background:var(--teamB);color:#3a1a08} .pill.none{color:var(--miss)}
+.recap{display:grid;gap:6px;width:100%}
+.recap div{display:flex;justify-content:space-between;gap:10px;padding:8px 12px;border-radius:10px;background:var(--night);font-weight:600}
+.recap div span:last-child{font-variant-numeric:tabular-nums;color:var(--sand);flex:none}
+.recap div.x span:last-child{color:var(--miss)}
+.pop{animation:pop .45s cubic-bezier(.2,1.6,.4,1)}
+@keyframes pop{from{transform:scale(.6);opacity:.3}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (max-width:380px){.brick{width:66px;height:36px}.bid b{font-size:24px}}
+</style>
+</head>
+<body>
+
+<div class="app" id="app"></div>
+
+<script>
+/* ---------- Thèmes (mots enfants // mots experts) ---------- */
+const THEMES = [
+ ["Animaux","A","chat|chien|lion|tigre|éléphant|girafe|singe|vache|cheval|mouton|cochon|poule|lapin|poisson|requin|dauphin|serpent|crocodile|papillon|abeille|araignée|grenouille|tortue|ours|loup|renard|souris|pingouin|chameau|escargot//caméléon|hippopotame|rhinocéros|guépard|panthère|kangourou|koala|paresseux|hérisson|castor|chauve-souris|hibou|perroquet|flamant rose|pieuvre|méduse|hippocampe|scorpion|lama|zèbre|morse|phoque|vautour|aigle"],
+ ["Cuisine marocaine","M","couscous|tajine|thé à la menthe|msemen|harira|pain|olive|orange|datte|miel|amande|beignet|brochette|poulet|citron|menthe|lait|œuf|soupe|gâteau|figue|grenade//pastilla|rfissa|tanjia|chebakia|briouate|zaalouk|bissara|baghrir|seffa|cornes de gazelle|amlou|smen|ras el hanout|safran|cumin|harissa|khlii|méchoui|sellou|pain d'orge"],
+ ["À table","T","pizza|frites|hamburger|chocolat|fromage|glace|crêpe|sandwich|spaghetti|bonbon|chips|pomme|banane|fraise|tomate|carotte|pastèque|ananas|cerise|raisin|fourchette|assiette//sushi|croissant|baguette|fondue|raclette|paella|lasagne|ramen|guacamole|tiramisu|macaron|quiche|ratatouille|omelette|vinaigrette|mayonnaise|ketchup|cornichon|avocat|aubergine"],
+ ["Métiers","J","docteur|pompier|policier|maîtresse|boulanger|coiffeur|cuisinier|pilote|facteur|fermier|dentiste|vétérinaire|astronaute|chanteur|footballeur|serveur|caissier|chauffeur|peintre|plombier//électricien|architecte|avocat|juge|journaliste|comptable|pharmacien|chirurgien|ingénieur|mécanicien|menuisier|bijoutier|horloger|douanier|steward|archéologue|photographe|traducteur|agriculteur|livreur"],
+ ["Sport","S","football|tennis|basket|natation|vélo|ski|course|ballon|but|arbitre|médaille|coupe|stade|piscine|judo|boxe|gymnastique|raquette|skate|trottinette//marathon|penalty|hors-jeu|carton rouge|handball|rugby|golf|escrime|équitation|surf|plongée|escalade|patinage|haltères|podium|record|Jeux olympiques|supporter|vestiaire|sifflet"],
+ ["La maison","H","lit|table|chaise|porte|fenêtre|cuisine|salon|chambre|douche|baignoire|télévision|canapé|lampe|tapis|clé|frigo|four|oreiller|couverture|miroir//aspirateur|machine à laver|lave-vaisselle|micro-ondes|grenier|cave|balcon|terrasse|escalier|ascenseur|interphone|radiateur|climatiseur|rideau|étagère|placard|cheminée|serrure|paillasson|poubelle"],
+ ["Transports","V","voiture|bus|train|avion|bateau|vélo|moto|camion|taxi|métro|tramway|fusée|hélicoptère|tracteur|ambulance|trottinette|route|pont|gare|feu rouge//montgolfière|sous-marin|téléphérique|péage|autoroute|rond-point|embouteillage|parking|permis de conduire|essence|pneu|volant|clignotant|ceinture|GPS|radar|aéroport|passeport|valise|décollage"],
+ ["Nature & météo","N","soleil|lune|étoile|nuage|pluie|neige|vent|arbre|fleur|mer|plage|montagne|rivière|forêt|désert|île|arc-en-ciel|orage|sable|feuille//volcan|tempête|éclair|tonnerre|brouillard|grêle|tsunami|ouragan|sécheresse|cascade|grotte|glacier|oasis|marée|vague|falaise|dune|canyon|saison|automne"],
+ ["Contes & aventure","C","princesse|roi|reine|château|dragon|sorcière|fée|pirate|trésor|chevalier|fantôme|monstre|géant|épée|couronne|baguette magique|licorne|ogre|carrosse|potion//labyrinthe|armure|catapulte|donjon|parchemin|grimoire|malédiction|sortilège|énigme|carte au trésor|naufrage|île déserte|sirène|vampire|loup-garou|momie|génie|lampe magique|tapis volant|elfe"],
+ ["L'école","E","école|cartable|crayon|cahier|livre|trousse|gomme|règle|stylo|tableau|maîtresse|récréation|cantine|devoirs|dictée|calcul|dessin|colle|ciseaux|bus scolaire//bulletin|examen|diplôme|professeur|directeur|calculatrice|compas|équerre|dictionnaire|atlas|conjugaison|grammaire|géographie|histoire|sciences|bibliothèque|uniforme|punition|exposé|rentrée"],
+ ["Fêtes & loisirs","F","anniversaire|cadeau|gâteau|bougie|ballon|fête|cirque|clown|parc|toboggan|balançoire|puzzle|poupée|jeu vidéo|dessin animé|cinéma|musique|danse|bonbon|piscine//karaoké|feu d'artifice|déguisement|magicien|acrobate|manège|grande roue|concert|théâtre|marionnette|carnaval|mariage|pique-nique|camping|tente|randonnée|jeu de société|échecs|cartes|selfie"],
+ ["Le corps","K","main|pied|tête|œil|nez|bouche|oreille|dent|cheveux|bras|jambe|ventre|dos|doigt|genou|cœur|langue|coude|épaule|ongle//cerveau|squelette|muscle|poumon|estomac|sang|cil|sourcil|menton|nombril|cheville|poignet|colonne vertébrale|hoquet|éternuement|bâillement|frisson|chatouille|empreinte|cicatrice"],
+ ["Technologie","@","téléphone|ordinateur|télévision|tablette|jeu vidéo|robot|photo|caméra|clavier|souris|écran|chargeur|batterie|internet|radio|montre|casque|console|lampe|télécommande//imprimante|mot de passe|wifi|application|algorithme|intelligence artificielle|drone|hologramme|réalité virtuelle|satellite|podcast|influenceur|emoji|clé USB|bluetooth|logiciel|virus informatique|code secret|manette|smartphone"],
+ ["Espace & sciences","*","soleil|lune|étoile|fusée|astronaute|planète|Terre|Mars|extraterrestre|soucoupe volante|ciel|nuit|télescope|aimant|loupe|dinosaure|squelette|volcan|eau|feu//galaxie|trou noir|météorite|comète|éclipse|gravité|satellite|oxygène|atome|molécule|ADN|microscope|laboratoire|expérience|photosynthèse|électricité|évolution|fossile|boussole|Voie lactée"],
+ ["Voyage & monde","W","valise|avion|hôtel|plage|carte|drapeau|photo|vacances|passeport|montagne|ski|tente|souvenir|bateau|train|désert|chameau|pyramide|Tour Eiffel|sable//décalage horaire|frontière|douane|escale|visa|guide|boussole|médina|souk|riad|hammam|safari|croisière|gondole|igloo|gratte-ciel|statue de la Liberté|muraille de Chine|Sahara|Atlas"],
+ ["Émotions & idées","♥","content|triste|peur|colère|rire|pleurer|bisou|câlin|ami|surprise|rêve|cauchemar|secret|mensonge|fatigue|faim|soif|froid|chaud|joie//patience|courage|jalousie|nostalgie|ironie|hasard|destin|liberté|justice|sagesse|promesse|vengeance|trahison|confiance|timidité|fierté|honte|ennui|curiosité|espoir"]
+].map(([name,ico,txt],id)=>{ const [e,h]=txt.split("//"); const sp=x=>x.split("|").map(s=>s.trim()).filter(Boolean); return {id,name,ico,easy:sp(e),hard:sp(h)}; });
+const LEVELS={enfants:"Enfants",mixte:"Mixte",experts:"Experts"};
+const MAXBID=5, pointsFor=b=>6-b;
+
+/* ---------- État ---------- */
+const store={
+  get(){ try{ return JSON.parse(localStorage.getItem("pyramide-settings2")||"null"); }catch(e){ return null; } },
+  set(v){ try{ localStorage.setItem("pyramide-settings2",JSON.stringify(v)); }catch(e){} }
+};
+const saved=store.get()||{};
+let S;
+function fresh(){
+  return {
+    screen:"home",
+    teams:[{name:saved.a||"Les Pharaons",score:0},{name:saved.b||"Les Sphinx",score:0}],
+    level:saved.level||"mixte", tours:saved.tours||2, sTime:saved.sTime!=null?saved.sTime:120, clock:null, timeUp:false, finalOn:saved.finalOn!==false, finalTime:saved.finalTime||60,
+    turn:0, series:0, offer:[], themesUsed:[], theme:null,
+    words:[], wIdx:0, bid:0, cluesUsed:0, shown:true,
+    used:[], final:null, mute:!!saved.mute
+  };
+}
+const totalSeries=()=>S.tours*2;
+
+/* ---------- Son & écran allumé ---------- */
+let actx=null;
+function tone(freqs,dur=.12){
+  if(S.mute) return;
+  try{
+    actx=actx||new (window.AudioContext||window.webkitAudioContext)();
+    freqs.forEach((f,i)=>{
+      const o=actx.createOscillator(),g=actx.createGain(),t=actx.currentTime+i*dur;
+      o.type="triangle"; o.frequency.value=f;
+      g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(.25,t+.02); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+      o.connect(g).connect(actx.destination); o.start(t); o.stop(t+dur+.02);
+    });
+  }catch(e){}
+}
+const sfx={win:()=>tone([523,659,784,1047],.1),miss:()=>tone([330,247],.16),tick:()=>tone([880],.05),end:()=>tone([392,330,262],.2),clue:()=>tone([440],.06)};
+let wake=null;
+async function keepAwake(){ try{ if(navigator.wakeLock&&!wake){ wake=await navigator.wakeLock.request("screen"); wake.addEventListener("release",()=>wake=null);} }catch(e){} }
+document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible"&&S.screen!=="home") keepAwake(); });
+
+/* ---------- Tirage des mots ---------- */
+function poolOf(theme){
+  if(S.level==="enfants") return [theme.easy];
+  if(S.level==="experts") return [theme.hard,theme.easy];
+  return [theme.easy.concat(theme.hard)];
+}
+function drawFrom(themes){
+  for(const tier of [0,1]){
+    let list=[];
+    themes.forEach(t=>{ const p=poolOf(t)[tier]; if(p) list=list.concat(p); });
+    list=list.filter(w=>!S.used.includes(w));
+    if(list.length){ const w=list[Math.floor(Math.random()*list.length)]; S.used.push(w); return w; }
+  }
+  const all=themes.flatMap(t=>t.easy.concat(t.hard)); const w=all[Math.floor(Math.random()*all.length)]; return w;
+}
+const mixAll=()=>THEMES;
+function themeList(){ return S.theme===-1?mixAll():[THEMES[S.theme]]; }
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+function makeOffer(){
+  let fresh=THEMES.filter(t=>!S.themesUsed.includes(t.id));
+  if(fresh.length<3) fresh=THEMES.slice();
+  S.offer=shuffle(fresh).slice(0,3).map(t=>t.id);
+}
+
+/* ---------- Rendu ---------- */
+const $app=document.getElementById("app");
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const tc=i=>i===0?"a":"b";
+const tColor=i=>`var(--team${i?"B":"A"})`;
+const logo=`<svg viewBox="0 0 26 22" aria-hidden="true"><path d="M13 1 25 21H1Z" fill="var(--sand)"/><path d="M5 14h16M8.5 8h9" stroke="var(--night)" stroke-width="2"/></svg>`;
+function head(){
+  return `<header><div class="logo">${logo}PYRAMIDE</div>
+  <div style="display:flex;gap:8px">
+    <button class="iconbtn" data-act="mute">${S.mute?"Son coupé":"Son"}</button>
+    ${S.screen!=="home"?`<button class="iconbtn" data-act="quit">Quitter</button>`:""}
+  </div></header>`;
+}
+function scores(active){
+  return `<div class="scores">${S.teams.map((t,i)=>`<div class="score ${tc(i)} ${active===i?"active":""}"><span>${esc(t.name)}</span><b>${t.score}</b></div>`).join("")}</div>`;
+}
+function bricks(list,cur){
+  const rows=[[0],[1,2],[3,4,5]];
+  return `<div class="bricks" aria-hidden="true">${rows.map(r=>`<div class="r">${r.map(i=>{
+    const w=list[i]; let cls="",txt="";
+    if(w&&w.found){cls="done";txt=w.pts!=null?"+"+w.pts:"✓";}
+    else if(w&&w.lost){cls="lost";txt="✗";}
+    if(cur===i) cls+=" cur";
+    return `<div class="brick ${cls}">${txt}</div>`;}).join("")}</div>`).join("")}</div>`;
+}
+const themeName=()=>S.theme===-1?"Mélange":THEMES[S.theme].name;
+const confirmQuit={on:false};
+
+function render(){
+  let h=head(); const sc=S.screen, t=S.turn;
+  if(confirmQuit.on){
+    h+=`<div class="panel" style="text-align:center"><h2>Quitter la partie ?</h2><p class="lead">Les scores de cette partie seront perdus.</p>
+      <div class="actions two"><button class="btn ghost" data-act="quitNo">Continuer</button><button class="btn miss" data-act="quitYes">Quitter</button></div></div>`;
+    $app.innerHTML=h; return;
+  }
+  if(sc==="home"){
+    h+=`<div style="display:flex;flex-direction:column;gap:8px;padding-top:6px">
+        <span class="eyebrow">Le jeu de mots de la télé, à la maison</span>
+        <h1>Pyramide</h1>
+        <p class="lead">Annoncez en combien de mots vous ferez deviner. Moins vous en annoncez, plus ça rapporte.</p>
+      </div>
+      <div class="panel">
+        <div class="row2">
+          <label class="f">Équipe 1<input type="text" id="ta" maxlength="18" value="${esc(S.teams[0].name)}"></label>
+          <label class="f">Équipe 2<input type="text" id="tb" maxlength="18" value="${esc(S.teams[1].name)}"></label>
+        </div>
+        <div class="fgroup"><span class="flabel">Niveau des mots</span>
+          <div class="seg">${Object.keys(LEVELS).map(k=>`<button data-level="${k}" aria-pressed="${S.level===k}">${LEVELS[k]}<small>${k==="enfants"?"mots simples":k==="mixte"?"faciles et durs":"mots difficiles"}</small></button>`).join("")}</div>
+        </div>
+        <div class="fgroup"><span class="flabel">Nombre de tours (6 mots par équipe à chaque tour)</span>
+          <div class="seg">${[1,2,3].map(n=>`<button data-tours="${n}" aria-pressed="${S.tours===n}">${n} tour${n>1?"s":""}<small>${n*6} mots / équipe</small></button>`).join("")}</div>
+        </div>
+        <div class="fgroup"><span class="flabel">Chrono pour faire deviner les 6 mots</span>
+          <div class="seg">${[[60,"1 min"],[90,"1 min 30"],[120,"2 min"],[180,"3 min"],[0,"Sans"]].map(([v,l])=>`<button data-stime="${v}" aria-pressed="${S.sTime===v}">${l}</button>`).join("")}</div>
+        </div>
+        <div class="toggle">Finale « La Pyramide » <button class="switch" role="switch" aria-checked="${S.finalOn}" data-act="final" aria-label="Finale"></button></div>
+        ${S.finalOn?`<div class="seg">${[45,60,90].map(n=>`<button data-ftime="${n}" aria-pressed="${S.finalTime===n}">${n} s</button>`).join("")}</div>`:""}
+      </div>
+      <button class="btn" data-act="start">Lancer la partie</button>
+      <details><summary>Les règles</summary><ol>
+        <li>Chaque équipe a un <b>donneur</b> qui voit le mot et des <b>devineurs</b> qui ne le voient pas.</li>
+        <li>L'équipe choisit un <b>thème</b>, puis joue <b>6 mots d'affilée</b>. Ensuite, c'est le tour de l'autre équipe.</li>
+        <li>Pour chaque mot, le donneur regarde le mot et <b>annonce en combien de mots</b> il va le faire deviner (de 1 à 5).</li>
+        <li>Chaque équipe a un <b>temps limité</b> pour ses 6 mots (réglable). Quand le chrono tombe à zéro, les mots restants sont perdus.</li>
+        <li>Il donne ses indices <b>un seul mot à la fois</b>. Trouvé dans le nombre annoncé : 1 mot = 5 pts, 2 = 4 pts, 3 = 3 pts, 4 = 2 pts, 5 = 1 pt. Sinon : 0.</li>
+        <li>Interdit : un mot de la même famille, une traduction, un geste ou un bruit. En cas de triche, le mot est perdu.</li>
+        <li>À la fin, l'équipe en tête joue la <b>Pyramide finale</b> : 6 mots contre la montre, indices libres.</li>
+      </ol></details>
+      <p class="small">${THEMES.length} thèmes · ${THEMES.reduce((n,t)=>n+t.easy.length+t.hard.length,0)} mots</p>`;
+  }
+  else if(sc==="theme"){
+    h+=scores(t)+`<div style="display:flex;flex-direction:column;gap:6px;text-align:center">
+      <span class="eyebrow">Tour ${Math.floor(S.series/2)+1} / ${S.tours}</span>
+      <h2><span style="color:${tColor(t)}">${esc(S.teams[t].name)}</span>, choisissez votre thème</h2>
+      <p class="lead">6 mots à faire deviner dans ce thème.</p></div>
+      <div class="themes">${S.offer.map(id=>{const th=THEMES[id];return `<button class="theme" data-th="${id}"><span class="ico">${th.ico}</span><span><b>${esc(th.name)}</b><small>${esc(th.easy.slice(0,3).join(", "))}…</small></span></button>`;}).join("")}
+        <button class="theme" data-th="-1"><span class="ico">?</span><span><b>Mélange</b><small>Des mots de tous les thèmes</small></span></button>
+      </div>
+      <button class="linkbtn" data-act="reoffer">Proposer d'autres thèmes</button>`;
+  }
+  else if(sc==="cover"){
+    h+=scores(t)+`<div class="cover">
+      <span class="eyebrow">${esc(themeName())} · 6 mots</span>
+      <div class="eye"><svg viewBox="0 0 50 50" aria-hidden="true"><path d="M4 25s8-13 21-13 21 13 21 13-8 13-21 13S4 25 4 25Z" fill="none" stroke="var(--sand)" stroke-width="3"/><circle cx="25" cy="25" r="6" fill="var(--sand)"/><path d="M8 42 42 8" stroke="var(--miss)" stroke-width="4" stroke-linecap="round"/></svg></div>
+      <h2>Devineurs de <span style="color:${tColor(t)}">${esc(S.teams[t].name)}</span>, retournez-vous !</h2>
+      <p class="lead">Seul le donneur regarde l'écran pendant les 6 mots.${S.sTime?`<br>Vous avez <b style="color:var(--sand)">${fmtT(S.sTime)}</b> pour les 6 mots. Le chrono part dès que vous touchez le bouton.`:""}</p>
+      ${bricks(S.words,null)}
+      <button class="btn" data-act="go">${S.sTime?"Lancer le chrono":"Voir le premier mot"}</button></div>`;
+  }
+  else if(sc==="bid"){
+    h+=`<div class="status"><span class="tag ${tc(t)}">${esc(S.teams[t].name)}</span><span class="tag">${esc(themeName())} · mot ${S.wIdx+1}/6</span></div>
+      ${sTimer()}
+      ${wordCard()}
+      <div style="text-align:center;display:flex;flex-direction:column;gap:4px"><h2>En combien de mots ?</h2><p class="small">Touchez un chiffre pour annoncer le nombre d'indices, puis donnez le premier.</p></div>
+      <div class="bids">${[1,2,3,4,5].map(n=>`<button class="bid" data-bid="${n}"><b>${n}</b><small>mot${n>1?"s":""}</small><span class="p">${pointsFor(n)} pt${pointsFor(n)>1?"s":""}</span></button>`).join("")}</div>
+      <button class="linkbtn" data-act="skip">Mot inconnu ? Changer de mot</button>`;
+  }
+  else if(sc==="play"){
+    const left=S.bid-S.cluesUsed;
+    h+=`<div class="status"><span class="tag ${tc(t)}">${esc(S.teams[t].name)}</span><span class="tag">En ${S.bid} mot${S.bid>1?"s":""} · ${pointsFor(S.bid)} pt${pointsFor(S.bid)>1?"s":""}</span></div>
+      ${sTimer()}
+      ${wordCard()}
+      <div class="slots" aria-label="Indices">${Array.from({length:S.bid},(_,i)=>`<div class="slot ${i<S.cluesUsed?"used":""} ${i===S.cluesUsed?"now":""}">${i+1}</div>`).join("")}</div>
+      <p class="turn">Indice n°${S.cluesUsed+1} sur ${S.bid}</p>
+      <div class="actions two">
+        <button class="btn miss" data-act="nope">${left>1?"Pas trouvé":"Perdu"}</button>
+        <button class="btn ${t?"okB":"ok"}" data-act="found">Trouvé +${pointsFor(S.bid)}</button>
+      </div>
+      <p class="small">${left>1?`Pas trouvé : il reste ${left-1} indice${left-1>1?"s":""}.`:"Dernier indice : si ce n'est pas trouvé, le mot est perdu."}</p>
+      <button class="linkbtn" data-act="cheat">Indice interdit : mot perdu</button>`;
+  }
+  else if(sc==="wres"){
+    const w=S.words[S.wIdx];
+    h+=scores(t)+sTimer()+`<div class="result">
+      <span class="eyebrow">Mot ${S.wIdx+1} / 6</span>
+      <div class="big pop">${esc(w.word)}</div>
+      ${w.found?`<span class="pill ${tc(t)}">Trouvé en ${w.clues} mot${w.clues>1?"s":""} · +${w.pts}</span>`:`<span class="pill none">Perdu · annoncé en ${w.bid}</span>`}
+      ${bricks(S.words,null)}
+    </div>
+    <button class="btn" data-act="nextWord">${S.wIdx<5?"Mot suivant":"Fin de la série"}</button>`;
+  }
+  else if(sc==="sres"){
+    const got=S.words.reduce((n,w)=>n+(w.pts||0),0), last=S.series+1>=totalSeries(), o=1-t;
+    h+=scores(t)+`<div class="result">
+      <span class="eyebrow">${S.timeUp?"Temps écoulé !":"Série terminée"} · ${esc(themeName())}</span>
+      ${!S.timeUp&&S.sTime&&S.clock?`<span class="small">6 mots joués avec ${fmtT(S.clock.left)} d'avance</span>`:""}
+      <h2 style="color:${tColor(t)}">${esc(S.teams[t].name)} marque ${got} point${got>1?"s":""}</h2>
+      <div class="recap">${S.words.map(w=>`<div class="${w.found?"":"x"}"><span>${esc(w.word)}</span><span>${w.found?`en ${w.clues} · +${w.pts}`:w.timeout?"temps écoulé":"✗"}</span></div>`).join("")}</div>
+    </div>
+    <button class="btn" data-act="nextSeries">${last?(S.finalOn&&S.teams[0].score!==S.teams[1].score?"Vers la finale":"Voir le résultat"):`Au tour de ${esc(S.teams[o].name)}`}</button>`;
+  }
+  else if(sc==="fcover"){
+    const w=S.final.team;
+    h+=scores(w)+`<div class="cover">
+      <span class="eyebrow">Finale</span><h1 style="font-size:clamp(34px,10vw,46px)">La Pyramide</h1>
+      <p class="lead"><b style="color:${tColor(w)}">${esc(S.teams[w].name)}</b> doit faire deviner <b>6 mots</b> en <b>${S.finalTime} secondes</b>, tous thèmes mélangés. Indices libres, un mot à la fois. On peut passer un mot et y revenir.</p>
+      ${bricks(S.final.found.map(f=>f?{found:true}:null),null)}
+      <button class="btn" data-act="fstart">Top départ !</button></div>`;
+  }
+  else if(sc==="fplay"){
+    const F=S.final,left=Math.max(0,F.left);
+    h+=`<div class="clock" id="clock">${Math.ceil(left)}</div>
+      <div class="timer ${left<=10?"low":""}"><i id="bar" style="width:${left/S.finalTime*100}%"></i></div>
+      ${bricks(F.found.map(f=>f?{found:true}:null),F.idx)}
+      <div class="word" style="cursor:default"><span class="hint">Mot ${F.found.filter(Boolean).length+1} / 6</span><span class="w">${esc(F.words[F.idx])}</span></div>
+      <div class="actions two">
+        <button class="btn ghost" data-act="fpass">Passer</button>
+        <button class="btn ${F.team?"okB":"ok"}" data-act="ffound">Trouvé</button>
+      </div>`;
+  }
+  else if(sc==="end"){
+    const [a,b]=S.teams, win=a.score===b.score?null:(a.score>b.score?0:1);
+    const F=S.final, n=F?F.found.filter(Boolean).length:0;
+    h+=`<div class="result" style="padding-top:8px">
+      <span class="eyebrow">Fin de la partie</span>
+      <h1 class="pop">${win===null?"Égalité !":esc(S.teams[win].name)}</h1>
+      ${win!==null?`<p class="lead">remporte la partie</p>`:""}
+    </div>
+    ${scores(win)}
+    ${F?`<div class="panel" style="text-align:center;align-items:center">
+      <span class="eyebrow">La Pyramide finale</span>${bricks(F.found.map(f=>f?{found:true}:null),null)}
+      <p><b>${n===6?"Pyramide complète, bravo !":`${n} mot${n>1?"s":""} sur 6 trouvé${n>1?"s":""}`}</b></p>
+      <p class="small">${F.words.map((w,i)=>`${F.found[i]?"✓":"✗"} ${esc(w)}`).join(" · ")}</p></div>`:""}
+    <div class="actions"><button class="btn" data-act="again">Revanche</button><button class="btn ghost" data-act="home">Changer les réglages</button></div>`;
+  }
+  $app.innerHTML=h;
+}
+function wordCard(){
+  const w=S.words[S.wIdx].word;
+  return `<div class="word ${S.shown?"":"hidden"}" data-act="hide" role="button" tabindex="0" aria-label="Afficher ou cacher le mot">
+    <span class="hint">${S.shown?"Donneur seulement · toucher pour cacher":"Mot caché · toucher pour afficher"}</span>
+    <span class="w">${S.shown?esc(w):"• • •"}</span></div>`;
+}
+
+function fmtT(sec){ sec=Math.max(0,Math.ceil(sec)); const m=Math.floor(sec/60), r=sec%60; return m+":"+String(r).padStart(2,"0"); }
+function sTimer(){
+  if(!S.sTime||!S.clock) return "";
+  const l=Math.max(0,S.clock.left), low=l<=10;
+  return `<div class="stimer" aria-label="Temps restant"><span id="sclock" class="sclock ${low?"low":""}">${fmtT(l)}</span><div class="timer ${low?"low":""}"><i id="sbar" style="width:${l/S.sTime*100}%"></i></div></div>`;
+}
+let sTimerId=null;
+function runSTimer(){
+  clearInterval(sTimerId);
+  let last=Math.ceil(S.clock.left);
+  sTimerId=setInterval(()=>{
+    const C=S.clock; if(!C){clearInterval(sTimerId);return;}
+    if(C.paused) return;
+    C.left=(C.endAt-Date.now())/1000;
+    const sec=Math.ceil(Math.max(0,C.left)), c=document.getElementById("sclock"), bar=document.getElementById("sbar");
+    if(c){ c.textContent=fmtT(C.left); c.classList.toggle("low",C.left<=10); }
+    if(bar){ bar.style.width=Math.max(0,C.left/S.sTime*100)+"%"; bar.parentElement.classList.toggle("low",C.left<=10); }
+    if(sec!==last){ last=sec; if(sec<=5&&sec>0) sfx.tick(); }
+    if(C.left<=0) timeUp();
+  },200);
+}
+function stopSTimer(){ clearInterval(sTimerId); if(S.clock) S.clock.left=Math.max(0,(S.clock.endAt-Date.now())/1000); }
+function timeUp(){
+  clearInterval(sTimerId); S.clock.left=0; sfx.end();
+  S.words.forEach((w,i)=>{ if(!w.found&&!w.lost){ w.lost=true; w.pts=0; w.timeout=true; if(i===S.wIdx&&S.screen==="play") w.bid=S.bid; } });
+  S.timeUp=true; S.screen="sres"; confirmQuit.on=false; render();
+}
+
+/* ---------- Déroulé ---------- */
+function startGame(){
+  const a=document.getElementById("ta").value.trim()||"Équipe 1", b=document.getElementById("tb").value.trim()||"Équipe 2";
+  S.teams=[{name:a,score:0},{name:b,score:0}];
+  store.set({a,b,level:S.level,tours:S.tours,sTime:S.sTime,finalOn:S.finalOn,finalTime:S.finalTime,mute:S.mute});
+  S.series=0; S.turn=0; S.final=null; S.themesUsed=[]; makeOffer(); S.screen="theme"; keepAwake();
+}
+function pickTheme(id){
+  S.theme=id; if(id>=0) S.themesUsed.push(id);
+  S.words=[]; for(let i=0;i<6;i++) S.words.push({word:drawFrom(themeList())});
+  S.wIdx=0; S.screen="cover";
+}
+function toBid(){ S.bid=0; S.cluesUsed=0; S.shown=true; S.screen="bid"; }
+function finishWord(found){
+  const w=S.words[S.wIdx];
+  w.bid=S.bid;
+  if(found){ w.found=true; w.clues=S.cluesUsed+1; w.pts=pointsFor(S.bid); S.teams[S.turn].score+=w.pts; sfx.win(); }
+  else { w.lost=true; w.pts=0; sfx.miss(); }
+  S.screen="wres";
+}
+function endSeries(){
+  S.series++;
+  if(S.series<totalSeries()){ S.turn=1-S.turn; makeOffer(); S.screen="theme"; return; }
+  const [a,b]=S.teams;
+  if(S.finalOn && a.score!==b.score){
+    const team=a.score>b.score?0:1, words=[];
+    for(let i=0;i<6;i++) words.push(drawFrom(mixAll()));
+    S.final={team,words,found:[false,false,false,false,false,false],idx:0,left:S.finalTime,endAt:0};
+    S.screen="fcover";
+  } else S.screen="end";
+}
+let timerId=null;
+function runTimer(){
+  clearInterval(timerId);
+  let lastSec=Math.ceil(S.final.left);
+  timerId=setInterval(()=>{
+    const F=S.final; if(!F||S.screen!=="fplay"){clearInterval(timerId);return;}
+    F.left=(F.endAt-Date.now())/1000;
+    const c=document.getElementById("clock"),bar=document.getElementById("bar"),sec=Math.ceil(Math.max(0,F.left));
+    if(c) c.textContent=sec;
+    if(bar){ bar.style.width=Math.max(0,F.left/S.finalTime*100)+"%"; bar.parentElement.classList.toggle("low",F.left<=10); }
+    if(sec!==lastSec){ lastSec=sec; if(sec<=5&&sec>0) sfx.tick(); }
+    if(F.left<=0){ clearInterval(timerId); sfx.end(); S.screen="end"; render(); }
+  },200);
+}
+function nextFinalIdx(){
+  const F=S.final;
+  for(let k=1;k<=6;k++){ const j=(F.idx+k)%6; if(!F.found[j]) return j; }
+  return -1;
+}
+function keepNames(){
+  const a=document.getElementById("ta"),b=document.getElementById("tb");
+  if(a) S.teams[0].name=a.value; if(b) S.teams[1].name=b.value;
+}
+
+$app.addEventListener("click",e=>{
+  const el=e.target.closest("[data-act],[data-level],[data-tours],[data-ftime],[data-stime],[data-th],[data-bid]"); if(!el||!$app.contains(el)) return;
+  const d=el.dataset;
+  if(d.level){ S.level=d.level; keepNames(); return render(); }
+  if(d.tours){ S.tours=+d.tours; keepNames(); return render(); }
+  if(d.ftime){ S.finalTime=+d.ftime; keepNames(); return render(); }
+  if(d.stime!==undefined){ S.sTime=+d.stime; keepNames(); return render(); }
+  if(d.th!==undefined){ const id=+d.th; if(id===-1||THEMES[id]) pickTheme(id); return render(); }
+  if(d.bid){ S.bid=+d.bid; S.cluesUsed=0; S.screen="play"; sfx.clue(); return render(); }
+  switch(d.act){
+    case "mute": S.mute=!S.mute; { const s=store.get()||{}; s.mute=S.mute; store.set(s);} if(S.screen==="home") keepNames(); break;
+    case "final": S.finalOn=!S.finalOn; keepNames(); break;
+    case "start": startGame(); break;
+    case "reoffer": makeOfferDifferent(); break;
+    case "go": S.timeUp=false; if(S.sTime){ S.clock={left:S.sTime,endAt:Date.now()+S.sTime*1000,paused:false}; runSTimer(); } else S.clock=null; toBid(); break;
+    case "hide": S.shown=!S.shown; break;
+    case "skip": S.words[S.wIdx].word=drawFrom(themeList()); S.shown=true; break;
+    case "found": finishWord(true); break;
+    case "nope":
+      if(S.cluesUsed+1>=S.bid) finishWord(false);
+      else { S.cluesUsed++; tone([300],.08); }
+      break;
+    case "cheat": finishWord(false); break;
+    case "nextWord":
+      if(S.wIdx<5){ S.wIdx++; toBid(); } else { stopSTimer(); S.screen="sres"; }
+      break;
+    case "nextSeries": endSeries(); break;
+    case "fstart": S.screen="fplay"; S.final.endAt=Date.now()+S.final.left*1000; runTimer(); break;
+    case "ffound": {
+      const F=S.final; F.found[F.idx]=true; sfx.win();
+      const j=nextFinalIdx(); if(j<0){ clearInterval(timerId); S.screen="end"; } else F.idx=j;
+      break; }
+    case "fpass": { const j=nextFinalIdx(); if(j>=0) S.final.idx=j; sfx.clue(); break; }
+    case "again": S.teams.forEach(x=>x.score=0); S.series=0; S.turn=0; S.final=null; S.themesUsed=[]; makeOffer(); S.screen="theme"; keepAwake(); break;
+    case "home": clearInterval(sTimerId); S.clock=null; S.screen="home"; S.teams.forEach(x=>x.score=0); S.final=null; break;
+    case "quit": confirmQuit.on=true; if(S.clock&&sTimerRunning()){ S.clock.left=(S.clock.endAt-Date.now())/1000; S.clock.paused=true; } if(S.screen==="fplay"){ S.final.left=(S.final.endAt-Date.now())/1000; clearInterval(timerId);} break;
+    case "quitNo": confirmQuit.on=false; if(S.clock&&S.clock.paused){ S.clock.endAt=Date.now()+S.clock.left*1000; S.clock.paused=false; } if(S.screen==="fplay"){ S.final.endAt=Date.now()+S.final.left*1000; runTimer(); } break;
+    case "quitYes": confirmQuit.on=false; clearInterval(timerId); clearInterval(sTimerId); S.clock=null; S.screen="home"; S.teams.forEach(x=>x.score=0); S.final=null; break;
+  }
+  render();
+});
+function makeOfferDifferent(){
+  const prev=S.offer.slice(); let tries=0;
+  do{ S.offer=shuffle(THEMES.filter(t=>!prev.includes(t.id))).slice(0,3).map(t=>t.id); tries++; }while(S.offer.length<3&&tries<3);
+}
+$app.addEventListener("keydown",e=>{ if((e.key==="Enter"||e.key===" ")&&e.target.dataset&&e.target.dataset.act==="hide"){ e.preventDefault(); e.target.click(); }});
+
+/* ---------- Démarrage (reprise si la page est mise à jour en pleine partie) ---------- */
+function boot(data){
+  S=(data&&data.S&&data.S.words)?data.S:fresh();
+  render();
+  if(S.screen==="fplay"&&S.final){ S.final.endAt=Date.now()+Math.max(0,S.final.left)*1000; runTimer(); }
+  if(S.clock&&sTimerRunning()){ S.clock.paused=false; S.clock.endAt=Date.now()+Math.max(0,S.clock.left)*1000; runSTimer(); }
+}
+function sTimerRunning(){ return ["bid","play","wres"].includes(S.screen); }
+window.claude?.hot?.snapshot?.(()=>{ if(S&&S.final&&S.screen==="fplay") S.final.left=(S.final.endAt-Date.now())/1000; if(S&&S.clock&&!S.clock.paused&&sTimerRunning()) S.clock.left=(S.clock.endAt-Date.now())/1000; return {S}; });
+window.claude?.hot?.ready?window.claude.hot.ready(boot):boot(window.claude?.hot?.data??{});
+</script>
+</body>
+</html>
